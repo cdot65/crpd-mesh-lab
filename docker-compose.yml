@@ -1,0 +1,70 @@
+version: "2.4"
+
+services:
+
+  "1":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 5
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "2":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 5
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "3":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 5
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "4":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 5
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  links:
+    build: addlink
+    privileged: true
+    network_mode: none
+    pid: "host"
+    restart: "no"
+    command: "honeycomb 4 5"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
