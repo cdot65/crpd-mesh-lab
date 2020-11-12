@@ -1,7 +1,7 @@
 #!/bin/bash
 
 project=honeycomb
-numroutes=$(make ps|grep init|wc -l)
+numroutes=$(docker ps| grep $project | grep init|wc -l)
 
 echo ""
 echo -n "waiting for ISIS adjacencies to come up "
