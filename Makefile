@@ -8,6 +8,11 @@ build:
 up: build
 	docker-compose --project-name ${PROJECT} up -d
 #	docker-compose --project-name ${PROJECT} up -d --scale row0=2
+	./validate.sh
+
+scale: build
+	docker-compose -f docker-compose-300.yml --project-name ${PROJECT} up -d
+	./validate.sh
 
 ps:
 	docker-compose --project-name ${PROJECT} ps

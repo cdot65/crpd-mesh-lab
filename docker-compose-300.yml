@@ -11,7 +11,7 @@ services:
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 5
+    scale: 50
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
@@ -25,7 +25,7 @@ services:
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 5
+    scale: 50
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
@@ -39,7 +39,7 @@ services:
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 5
+    scale: 50
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
@@ -53,7 +53,7 @@ services:
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 5
+    scale: 50
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
@@ -67,7 +67,7 @@ services:
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 5
+    scale: 50
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
@@ -81,7 +81,7 @@ services:
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 5
+    scale: 50
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
@@ -92,7 +92,7 @@ services:
     network_mode: none
     pid: "host"
     restart: "no"
-    command: "honeycomb 6 5"
+    command: "honeycomb 6 50"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 

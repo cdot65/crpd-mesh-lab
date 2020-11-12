@@ -11,11 +11,12 @@ while true; do
   sleep 1
 done
 
-echo -n "waiting for $numroutes learned "
+echo -n "waiting for $numroutes routes learned "
 while true; do
   docker exec  honeycomb_1_3 ip -6 r |grep -v / |wc -l | grep $numroutes && break
   echo -n "."
   sleep 1
 done
 
+docker logs honeycomb_links_1 |grep Completed
 echo "validation completed in $SECONDS seconds"

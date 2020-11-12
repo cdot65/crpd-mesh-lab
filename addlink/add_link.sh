@@ -5,16 +5,12 @@ MTU=3000
 function addlink {
   c1=$1
   c2=$2
-  until [ ! -z "$(docker ps -q -f name=$c1)" ]; do
+  until [ ! -z "$(docker ps -q -f name=${c1}$)" ]; do
      echo "waiting for container $c1 ..."
      sleep 1
-     if [ $SECONDS -gt 5 ]; then
-        echo "$c1 not running"
-        exit 1
-     fi
   done
 
-  fc1=$(docker ps -q -f name=$c1)
+  fc1=$(docker ps -q -f name=${c1}$)
   echo "$c1 $fc1"
   pid1=$(docker inspect -f "{{.State.Pid}}" $fc1)
   if [ -z "$pid1" ]; then
@@ -22,16 +18,12 @@ function addlink {
       exit 1
   fi
 
-  until [ ! -z "$(docker ps -q -f name=$c2)" ]; do
+  until [ ! -z "$(docker ps -q -f name=${c2}$)" ]; do
      echo "waiting for container $c2 ..."
      sleep 1
-     if [ $SECONDS -gt 5 ]; then
-        echo "$c1 not running"
-        exit 1
-     fi
   done
 
-  fc2=$(docker ps -q -f name=$c2)
+  fc2=$(docker ps -q -f name=${c2}$)
   echo "$c2 $fc2"
   pid2=$(docker inspect -f "{{.State.Pid}}" $fc2)
   if [ -z "$pid2" ]; then
@@ -95,6 +87,7 @@ set -e	# terminate on error
 mkdir -p /var/run/netns
 
 SECONDS=0
+count=0
 
 for row in $(seq 1 $rows); do
   for col in $(seq 1 $cols); do
@@ -102,6 +95,7 @@ for row in $(seq 1 $rows); do
       let "left=col-1"
       echo "create link between ${project}_${row}_${left} and ${project}_${row}_${col} ..."
       addlink ${project}_${row}_${left} ${project}_${row}_${col}
+      let "count=count+1"
     fi
     if [ $row -gt 1 ]; then
       let "down=row-1"
@@ -110,18 +104,20 @@ for row in $(seq 1 $rows); do
         if [ $(expr $col % 2) -ne 0 ]; then
           echo "create link between ${project}_${row}_${col} and ${project}_${down}_${col} ..."
           addlink ${project}_${row}_${col} ${project}_${down}_${col}
+          let "count=count+1"
         fi
       else
         # odd rows
         if [ $(expr $col % 2) -eq 0 ]; then
           echo "create link between ${project}_${row}_${col} and ${project}_${down}_${col} ..."
           addlink ${project}_${row}_${col} ${project}_${down}_${col}
+          let "count=count+1"
         fi
       fi
     fi
   done
 done
 
-echo "done"
+echo "Completed $count links for $rows x $cols nodes in $SECONDS seconds"
 
 tail -f /dev/null
