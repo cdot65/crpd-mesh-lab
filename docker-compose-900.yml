@@ -4,240 +4,420 @@ services:
 
   "1":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "2":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "3":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "4":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "5":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "6":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "7":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "8":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "9":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "10":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "11":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "12":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "13":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "14":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "15":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "16":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "17":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "18":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "19":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
 
   "20":
     build: node
+    tty: true
+    stdin_open: true
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv6.conf.all.forwarding=1
     privileged: true
     network_mode: none
-    scale: 20
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "21":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "22":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "23":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "24":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "25":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "26":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "27":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "28":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "29":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
+    volumes:
+      - ${PWD}/juniper.conf:/juniper.conf:ro
+      - ${PWD}/network-init.sh:/network-init.sh:ro
+
+  "30":
+    build: node
+    tty: true
+    stdin_open: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+    privileged: true
+    network_mode: none
+    scale: 30
     volumes:
       - ${PWD}/juniper.conf:/juniper.conf:ro
       - ${PWD}/network-init.sh:/network-init.sh:ro
@@ -248,7 +428,7 @@ services:
     network_mode: none
     pid: "host"
     restart: "no"
-    command: "honeycomb 20 20"
+    command: "honeycomb 30 30"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
