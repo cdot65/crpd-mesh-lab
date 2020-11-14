@@ -15,7 +15,7 @@ rows and columns as arguments to the link container in the docker-compose file.
 
 - Linux based baremetal server with enough memory (150MB per cRPD instances, e.g. 400 nodes fit within 64GB of RAM)
 - Docker with docker-compose 
-- Juniper cRPD 20.3R1 or newer container image (http://https://www.juniper.net/us/en/dm/crpd-trial/)
+- Juniper cRPD 20.3R1 or newer container image (https://www.juniper.net/us/en/dm/crpd-trial/)
 - tested so far on Ubuntu 20.04, Fedora 33 and on Docker-for-Mac
 
 ## 20-node deployment
