@@ -156,14 +156,19 @@ fd00::ffa8:fdac:22b1/128 2       5       50 int eth1       IPV6 aeb8c5e574e7
                                            eth0            IPV6 3ca6d0148dd9       
 
 node_20 loopback ipv6 is fd00::1721:cfa0:1f1c
-
+                                           
 show route to node_20 from node1:
 fd00::1721:cfa0:1f1c from :: via fe80::3c05:96ff:fe0e:4de dev eth0 proto 22 src fd00::f926:317:529 metric 1024 pref medium
 
 traceroute to node_20 from node1 with 16 simultaneous probes:
 traceroute to fd00::1721:cfa0:1f1c (fd00::1721:cfa0:1f1c), 30 hops max, 80 byte packets
- 1  fd00::aeb8:c5e5:74e7  0.061 ms  0.007 ms  0.005 ms  0.005 ms  0.004 ms  0.005 ms
- 2  fd00::2835:a2d2:58a0  0.037 ms !N  0.008 ms !N  0.007 ms !N  0.008 ms !N  0.007 ms !N  0.007 ms !N
+ 1  fd00::aeb8:c5e5:74e7  0.047 ms  0.004 ms  0.003 ms  0.003 ms  0.003 ms  0.002 ms
+ 2  fd00::2835:a2d2:58a0  0.024 ms  0.005 ms  0.005 ms  0.005 ms  0.004 ms  0.004 ms
+ 3  fd00::a879:53d7:b45f  0.028 ms fd00::6a39:bec6:5c8c  0.032 ms fd00::a879:53d7:b45f  0.008 ms fd00::6a39:bec6:5c8c  0.006 ms  0.008 ms  0.005 ms
+ 4  fd00::89f7:a4e2:3e16  0.033 ms  0.007 ms fd00::c5b7:a773:8fb0  0.030 ms  0.011 ms  0.011 ms fd00::89f7:a4e2:3e16  0.010 ms
+ 5  fd00::ffa8:fdac:22b1  0.050 ms  0.011 ms  0.008 ms  0.007 ms  0.011 ms fd00::c46b:d0f:f12  0.029 ms
+ 6  fd00::1f5d:e4d8:5977  0.029 ms  0.009 ms fd00::631d:6dff:f87d  0.035 ms fd00::1f5d:e4d8:5977  0.011 ms fd00::631d:6dff:f87d  0.009 ms fd00::1f5d:e4d8:5977  0.010 ms
+ 7  fd00::1721:cfa0:1f1c  0.034 ms  0.047 ms  0.012 ms  0.011 ms  0.010 ms  0.010 ms
 
 show isis spf log on node_1
  IS-IS level 1 SPF log:
