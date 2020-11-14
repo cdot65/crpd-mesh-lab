@@ -1,0 +1,769 @@
+docker-compose --project-name honeycomb build
+Step 1/6 : FROM crpd:20.3R1.8
+ ---> b52c3fc6235a
+Step 2/6 : RUN apt-get update   && apt-get -y --no-install-recommends install bwm-ng gettext-base   && rm -rf /var/lib/apt/lists/*
+ ---> Using cache
+ ---> c965b177b9ac
+Step 3/6 : COPY runit-init.sh /sbin/
+ ---> Using cache
+ ---> ed1610fbe77b
+Step 4/6 : RUN chmod +x /sbin/runit-init.sh
+ ---> Using cache
+ ---> 8ad8488ec450
+Step 5/6 : WORKDIR /root
+ ---> Using cache
+ ---> b28ecd4661ed
+Step 6/6 : STOPSIGNAL 35
+ ---> Using cache
+ ---> 5842f3177820
+
+Successfully built 5842f3177820
+Successfully tagged honeycomb_node:latest
+Step 1/5 : FROM ubuntu:latest
+ ---> d70eaf7277ea
+Step 2/5 : RUN apt-get update       && apt-get -y --no-install-recommends install docker.io iproute2 net-tools python3-pip libcairo2       && pip3 install docker pyroute2 python-igraph cairocffi
+ ---> Using cache
+ ---> 3070a6f5eb64
+Step 3/5 : COPY add_link.py /
+ ---> Using cache
+ ---> de5ba99c4747
+Step 4/5 : RUN chmod a+rx /add_link.py && mkdir /var/run/netns
+ ---> Using cache
+ ---> cbdc3a0e6a15
+Step 5/5 : ENTRYPOINT ["/usr/bin/python3", "/add_link.py"]
+ ---> Using cache
+ ---> 7e59c5454adc
+
+Successfully built 7e59c5454adc
+Successfully tagged honeycomb_links:latest
+docker-compose -f docker-compose-400.yml --project-name honeycomb down --remove-orphans
+docker-compose -f docker-compose-400.yml --project-name honeycomb up -d
+./validate.sh
+
+waiting for ISIS adjacencies to come up ..............3
+waiting for 400 routes learned ...
+
+742 routes learned
+Completed 570 links for 400 (20x20) nodes in 120 seconds
+validation completed in 106 seconds
+
+network diagram saved in
+-rw-r--r-- 1 mwiget mwiget 315621 Nov 14 13:27 honeycomb.png
+./test-nodes.sh
+
+400 nodes found
+
+show route summary on node 3:
+Autonomous system number: 4259905011
+Router ID: 10.0.0.11
+
+RIB Unique destination routes high watermark: 410 at 2020-11-14 12:27:18
+RIB routes high watermark: 410 at 2020-11-14 12:27:18
+FIB routes high watermark: 400 at 2020-11-14 12:27:18
+VRF type routing instances high watermark: 0 at 2020-11-14 12:26:58
+
+iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
+              Direct:      1 routes,      1 active
+
+inet6.0: 409 destinations, 409 routes (409 active, 0 holddown, 0 hidden)
+              Direct:      3 routes,      3 active
+               Local:      6 routes,      6 active
+               IS-IS:    399 routes,    399 active
+               INET6:      1 routes,      1 active
+show first few routes on crpd node 3:
+
+iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
++ = Active Route, - = Last Active, * = Both
+
+47.0005.abcd.abcd.0000.0000.0010.6547.f1c2.97dc/152               
+                   *[Direct/0] 00:00:29
+                    >  via lo.0
+
+inet6.0: 409 destinations, 409 routes (409 active, 0 holddown, 0 hidden)
++ = Active Route, - = Last Active, * = Both
+
+::/96              *[Direct/0] 00:00:29
+                    >  via sit0
+::127.0.0.1/128    *[Local/0] 00:00:29
+                       Local via sit0
+fd00::5a:9e29:442f/128
+                   *[IS-IS/18] 00:00:15, metric 340
+                    >  to fe80::c88:daff:fed0:2b19 via eth2
+fd00::84:ad8b:368c/128
+                   *[IS-IS/18] 00:00:09, metric 290
+                    >  to fe80::583b:beff:fe23:8b21 via eth1
+                       to fe80::c88:daff:fed0:2b19 via eth2
+fd00::8e:2923:33c2/128
+                   *[IS-IS/18] 00:00:09, metric 150
+                       to fe80::583b:beff:fe23:8b21 via eth1
+                    >  to fe80::c88:daff:fed0:2b19 via eth2
+fd00::142:f9be:fdcd/128
+                   *[IS-IS/18] 00:00:15, metric 230
+                    >  to fe80::c88:daff:fed0:2b19 via eth2
+fd00::1cc:3d29:67e0/128
+                   *[IS-IS/18] 00:00:15, metric 70
+                    >  to fe80::c88:daff:fed0:2b19 via eth2
+fd00::1e8:c305:ec5f/128
+                   *[IS-IS/18] 00:00:09, metric 90
+                    >  to fe80::583b:beff:fe23:8b21 via eth1
+                       to fe80::c88:daff:fed0:2b19 via eth2
+fd00::275:6665:e3fa/128
+                   *[IS-IS/18] 00:00:09, metric 340
+                    >  to fe80::c88:daff:fed0:2b19 via eth2
+fd00::533:80f5:9f3f/128
+
+show first few routes on node 3:
+::/96 dev sit0 proto kernel metric 256 pref medium
+fd00::5a:9e29:442f via fe80::c88:daff:fed0:2b19 dev eth2 proto 22 metric 1024 pref medium
+fd00::84:ad8b:368c proto 22 metric 1024 
+	nexthop via fe80::583b:beff:fe23:8b21 dev eth1 weight 1 
+	nexthop via fe80::c88:daff:fed0:2b19 dev eth2 weight 1 
+fd00::8e:2923:33c2 proto 22 metric 1024 
+	nexthop via fe80::583b:beff:fe23:8b21 dev eth1 weight 1 
+	nexthop via fe80::c88:daff:fed0:2b19 dev eth2 weight 1 
+fd00::142:f9be:fdcd via fe80::c88:daff:fed0:2b19 dev eth2 proto 22 metric 1024 pref medium
+fd00::1cc:3d29:67e0 via fe80::c88:daff:fed0:2b19 dev eth2 proto 22 metric 1024 pref medium
+fd00::1e8:c305:ec5f proto 22 metric 1024 
+	nexthop via fe80::583b:beff:fe23:8b21 dev eth1 weight 1 
+	nexthop via fe80::c88:daff:fed0:2b19 dev eth2 weight 1 
+fd00::275:6665:e3fa via fe80::c88:daff:fed0:2b19 dev eth2 proto 22 metric 1024 pref medium
+fd00::533:80f5:9f3f proto 22 metric 1024 
+	nexthop via fe80::583b:beff:fe23:8b21 dev eth1 weight 1 
+	nexthop via fe80::c88:daff:fed0:2b19 dev eth2 weight 1 
+fd00::5c7:8d53:c36f via fe80::c88:daff:fed0:2b19 dev eth2 proto 22 metric 1024 pref medium
+fd00::610:28af:8293 via fe80::c88:daff:fed0:2b19 dev eth2 proto 22 metric 1024 pref medium
+fd00::62e:ff91:c95e via fe80::c88:daff:fed0:2b19 dev eth2 proto 22 metric 1024 pref medium
+
+show isis routes on node 1:
+ IS-IS routing table             Current version: L1: 1 L2: 12
+IPv4/IPv6 Routes
+----------------
+Prefix             L Version   Metric Type Interface       NH   Via                 Backup Score
+fd00::5a:9e29:442f/128 2      12      340 int eth1         IPV6 0fcba2972cb6       
+fd00::84:ad8b:368c/128 2      12      310 int eth1         IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::8e:2923:33c2/128 2      12      170 int eth0         IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::142:f9be:fdcd/128 2      12      230 int eth1        IPV6 0fcba2972cb6       
+fd00::1cc:3d29:67e0/128 2      12       90 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1e8:c305:ec5f/128 2      12      110 int eth0        IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::275:6665:e3fa/128 2      12      340 int eth1        IPV6 0fcba2972cb6       
+fd00::533:80f5:9f3f/128 2      12      240 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5c7:8d53:c36f/128 2      12      350 int eth1        IPV6 0fcba2972cb6       
+fd00::610:28af:8293/128 2      12      280 int eth1        IPV6 0fcba2972cb6       
+fd00::62e:ff91:c95e/128 2      12      310 int eth1        IPV6 0fcba2972cb6       
+fd00::793:fdd5:7589/128 2      12      150 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::7ce:ad94:5d09/128 2      12      250 int eth1        IPV6 0fcba2972cb6       
+fd00::82f:fcb5:97fe/128 2      12      260 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a3b:ad61:1905/128 2      12      260 int eth1        IPV6 0fcba2972cb6       
+fd00::ab4:6371:7da0/128 2      12      380 int eth1        IPV6 0fcba2972cb6       
+fd00::cd9:6fdf:751b/128 2      12      290 int eth1        IPV6 0fcba2972cb6       
+fd00::f6f:8863:4bf1/128 2      12      230 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::f7b:b4cc:7a45/128 2      12      350 int eth1        IPV6 0fcba2972cb6       
+fd00::f8b:cd92:feb2/128 2      12      260 int eth1        IPV6 0fcba2972cb6       
+fd00::f8c:bd4f:6e0e/128 2      12      310 int eth1        IPV6 0fcba2972cb6       
+fd00::fcb:a297:2cb6/128 2      12       10 int eth1        IPV6 0fcba2972cb6       
+fd00::10bb:eb8e:4f70/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+fd00::1151:ec03:1e5/128 2      12      350 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1187:2147:8cd1/128 2      12      100 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1209:88c0:21d3/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::12b4:f099:d41/128 2      12      240 int eth1        IPV6 0fcba2972cb6       
+fd00::132d:126b:a5de/128 2      12      150 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::13ea:dc90:9f5a/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::146e:c1de:9765/128 2      12      140 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1508:e5a5:d033/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+fd00::1567:684a:dc5/128 2      12      130 int eth1        IPV6 0fcba2972cb6       
+fd00::1659:8cef:6aa9/128 2      12      130 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::17fb:e7d7:15b1/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::185c:d898:226e/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::18d7:f4f9:34fe/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1917:5478:5e0c/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1a4b:be45:786b/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::1b12:a10a:2618/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+fd00::1b61:4bcc:2a5d/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+fd00::1b8f:78f4:d3ad/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1c99:3b08:8ea0/128 2      12      100 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1d39:adbd:beac/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::1d51:a552:f52e/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+fd00::226f:f07:66c0/128 2      12      370 int eth1        IPV6 0fcba2972cb6       
+fd00::25eb:f7b:b2bc/128 2      12      210 int eth1        IPV6 0fcba2972cb6       
+fd00::2615:17eb:36cb/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::2698:7992:f014/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+fd00::26ae:4bc1:db07/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::27d4:edc0:ae30/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::27f2:b5df:b9af/128 2      12      140 int eth0       IPV6 3fa41a4ff534       
+fd00::282f:c125:75ca/128 2      12       50 int eth0       IPV6 3fa41a4ff534       
+fd00::2913:51f9:7367/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+fd00::2937:80fe:bdb7/128 2      12       80 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::2a28:e306:bcfc/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::2a89:5f80:7d12/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+fd00::2ac0:9683:9bcc/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::2c80:90ec:6ba2/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+fd00::2c8d:13ee:feea/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+fd00::2d19:eed4:5dc9/128 2      12      140 int eth1       IPV6 0fcba2972cb6       
+fd00::2d1b:12e7:6db5/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::2db0:6b3d:42f0/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+fd00::2dbb:e313:dd8b/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+fd00::2e3f:890d:8e4d/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+fd00::30c5:6265:1748/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::30f7:a7c6:f7c1/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+fd00::320b:3019:5373/128 2      12      350 int eth1       IPV6 0fcba2972cb6       
+fd00::332e:98d:702e/128 2      12      300 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::335a:4e39:97a1/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+fd00::34fe:2b46:2036/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+fd00::35e3:944b:3eb8/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::36a9:83bf:1056/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::36aa:2e1b:76a7/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::36da:9336:fae/128 2      12      240 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::36f4:bd32:1632/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::3732:e471:5d4f/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+fd00::3a89:81d:3f63/128 2      12       90 int eth1        IPV6 0fcba2972cb6       
+fd00::3a93:58a9:db34/128 2      12       70 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::3a93:728a:3db0/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::3c5e:91b9:6120/128 2      12      140 int eth1       IPV6 0fcba2972cb6       
+fd00::3d0f:21d5:a3bd/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::3ddc:6ada:a0b1/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::3fa4:1a4f:f534/128 2      12       10 int eth0       IPV6 3fa41a4ff534       
+fd00::4003:6e90:79b/128 2      12      320 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::401a:74e0:c347/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+fd00::4046:db89:5f14/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::405d:fac0:dab0/128 2      12      160 int eth0       IPV6 3fa41a4ff534       
+fd00::4063:f63a:a5ab/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::407e:e185:8c79/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::4170:9f81:b527/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::425d:d0a0:4c19/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+fd00::43c0:6dba:2808/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::448b:1ef9:bd33/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+fd00::451b:569b:fd/128 2      12      210 int eth1         IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::4537:140b:7621/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::4688:8959:aaed/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::46b7:fd85:d421/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::4700:d1cc:ef7e/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::4926:1530:d608/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+fd00::4ac2:b187:8100/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+fd00::4b0e:a431:53d0/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+fd00::4c58:3a9f:4c35/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::4c74:868c:f19/128 2      12      170 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::4cc4:cf63:567c/128 2      12      170 int eth0       IPV6 3fa41a4ff534       
+fd00::4d30:9189:da6/128 2      12      200 int eth0        IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::4d33:c80d:e295/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+fd00::4d43:cdf:8168/128 2      12      160 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::4e3b:c11f:967a/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::4f4d:15b7:228b/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+fd00::4f5d:df54:f577/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+fd00::4f7e:1812:aa6f/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5114:be63:6b27/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5137:197b:f749/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5199:8884:f561/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::51e9:2dd9:a322/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::51fe:f71a:d495/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::522c:e70b:ebd0/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::52c0:f7a5:3887/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::52e6:585:bcea/128 2      12      180 int eth0        IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::5335:8017:6d21/128 2      12      350 int eth1       IPV6 0fcba2972cb6       
+fd00::5373:497f:72cb/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::54da:de48:fb/128 2      12      220 int eth1         IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::54f2:1271:74dc/128 2      12       60 int eth1       IPV6 0fcba2972cb6       
+fd00::55dd:2690:5577/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5663:be9e:269d/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+fd00::5678:2fc8:b76e/128 2      12      170 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::56fb:796e:a548/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5709:5da5:abf0/128 2      12      210 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::59be:4188:d661/128 2      12      110 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::59e3:aa4:d4da/128 2      12      130 int eth0        IPV6 3fa41a4ff534       
+fd00::5a19:bda6:e560/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+fd00::5a49:c0a4:58c1/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5a8a:1d11:f88f/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+fd00::5ad8:d874:1b3b/128 2      12      180 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::5c73:73d5:abc5/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::5d0e:9b11:107c/128 2      12       80 int eth1       IPV6 0fcba2972cb6       
+fd00::5d2d:8231:4773/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+fd00::5d52:ccc9:75ac/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+fd00::5d64:36ce:a08a/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::5dbb:8917:fc6a/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+fd00::5f50:d929:5c58/128 2      12      150 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::5fb4:18c:33ab/128 2      12      170 int eth1        IPV6 0fcba2972cb6       
+fd00::6002:415f:2ffe/128 2      12      190 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::6012:377b:14a3/128 2      12       90 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::60a5:f2e8:e88/128 2      12       90 int eth1        IPV6 0fcba2972cb6       
+fd00::60e6:d212:36c/128 2      12      350 int eth1        IPV6 0fcba2972cb6       
+fd00::61fb:a436:3793/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::6266:7ab3:b83c/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::626e:c175:72b/128 2      12      270 int eth1        IPV6 0fcba2972cb6       
+fd00::6343:3a85:8b60/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::6479:3202:1aee/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+fd00::650d:9635:a36/128 2      12      130 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::6547:f1c2:97dc/128 2      12       20 int eth0       IPV6 3fa41a4ff534       
+fd00::6554:e3ca:e885/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::6602:fb6d:c47e/128 2      12       40 int eth1       IPV6 0fcba2972cb6       
+fd00::6658:f567:c723/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+fd00::66b3:7b67:9d11/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+fd00::6743:4f84:bed4/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+fd00::675e:f00c:f928/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+fd00::6760:7cee:a175/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::6847:3001:c78a/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::687e:5228:d01/128 2      12       60 int eth0        IPV6 3fa41a4ff534       
+fd00::6907:10d:2ea2/128 2      12       40 int eth1        IPV6 0fcba2972cb6       
+fd00::6916:a236:1b3b/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::69bb:67ce:8d3a/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+fd00::69eb:d287:b4a/128 2      12      340 int eth1        IPV6 0fcba2972cb6       
+fd00::6a43:5ddf:fef8/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+fd00::6b24:d417:2086/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::6cef:a95e:98da/128 2      12      140 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::6d4b:a82c:faef/128 2      12       70 int eth0       IPV6 3fa41a4ff534       
+fd00::6dd3:3ed8:8593/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::6de0:ab96:e306/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+fd00::6e01:2c52:f1b5/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::7032:81c5:f78/128 2      12      290 int eth1        IPV6 0fcba2972cb6       
+fd00::7311:2045:784d/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::744a:ce8a:92f1/128 2      12       80 int eth1       IPV6 0fcba2972cb6       
+fd00::7496:f072:e4c9/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+fd00::753b:19d7:4c6f/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+fd00::7581:3be4:eff/128 2      12      280 int eth1        IPV6 0fcba2972cb6       
+fd00::75ca:2da:bc29/128 2      12      190 int eth1        IPV6 0fcba2972cb6       
+fd00::75f4:fb24:a7a9/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+fd00::7703:cabf:9b04/128 2      12      350 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::77a7:b232:87af/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::77eb:5928:51ae/128 2      12      150 int eth0       IPV6 3fa41a4ff534       
+fd00::7968:a673:bb8e/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+fd00::79d3:17ca:3f09/128 2      12      120 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::7a33:4b91:c1a6/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+fd00::7aaa:8f03:c684/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+fd00::7add:cac:3df9/128 2      12      210 int eth1        IPV6 0fcba2972cb6       
+fd00::7b73:b6fc:e4b5/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::7bdc:5732:3380/128 2      12      110 int eth1       IPV6 0fcba2972cb6       
+fd00::7cb5:3346:2e9e/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::7d5f:9ab0:ef7a/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+fd00::7da5:7d31:881e/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::7def:5005:4564/128 2      12      160 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::7df4:afda:8b29/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::7f6e:3e56:5100/128 2      12      100 int eth0       IPV6 3fa41a4ff534       
+fd00::7fb8:e412:fdf1/128 2      12      350 int eth1       IPV6 0fcba2972cb6       
+fd00::8055:9737:16d/128 2      12      190 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::814d:aa95:90f9/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::81c2:6521:19ad/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::81ef:6766:ee9f/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+fd00::82f9:ba27:48a/128 2      12       50 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::8395:a3:f0d2/128 2      12      200 int eth1         IPV6 0fcba2972cb6       
+fd00::83ab:8170:3873/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::849f:444f:510e/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::85f6:5ceb:92d1/128 2      12      190 int eth0       IPV6 3fa41a4ff534       
+fd00::863a:bc4e:1854/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+fd00::8688:3ff5:cb71/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::86d7:b785:7beb/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+fd00::883f:f876:36b5/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::88b4:9763:1ede/128 2      12       40 int eth0       IPV6 3fa41a4ff534       
+fd00::8ac1:f9e9:905d/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::8ae6:cc3d:f642/128 2      12      190 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::8b24:8503:21c6/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+fd00::8cc4:758f:7577/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::8d46:dbfc:4cb8/128 2      12      350 int eth1       IPV6 0fcba2972cb6       
+fd00::8d53:faa1:5366/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+fd00::8ef7:cf8a:d930/128 2      12      140 int eth1       IPV6 0fcba2972cb6       
+fd00::90a3:d012:83a2/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+fd00::9104:91c5:998/128 2      12      330 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::9378:c4c5:7c92/128 2      12      110 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::938a:cdbb:5fe7/128 2      12      100 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::93c7:c078:5623/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+fd00::9456:ee25:a512/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::9532:b35c:5c19/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::954a:5ab3:bab5/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+fd00::95b5:75d3:aaad/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::95ca:a162:5e3f/128 2      12      130 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::966f:b2c0:38e5/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+fd00::9772:5cb7:b2e3/128 2      12      110 int eth0       IPV6 3fa41a4ff534       
+fd00::98e2:b532:d65f/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::9a5c:a039:85e4/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::9af8:a464:10ed/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+fd00::9b16:6352:86b2/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::9b38:5e23:f27e/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+fd00::9bcd:dd54:117f/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+fd00::9c13:8365:b9a6/128 2      12      160 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::9c27:e8b2:cdb1/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+fd00::9f63:3b2e:9111/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+fd00::9fcb:5ca6:54ce/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+fd00::9fee:ff49:52fa/128 2      12       30 int eth1       IPV6 0fcba2972cb6       
+fd00::a0d6:a418:d071/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a189:4c8c:7606/128 2      12      170 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a1b7:e394:998d/128 2      12       90 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a1d3:aa7e:a11/128 2      12      330 int eth1        IPV6 0fcba2972cb6       
+fd00::a371:85a7:2c1b/128 2      12       20 int eth1       IPV6 0fcba2972cb6       
+fd00::a37a:1151:63e1/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a408:95d8:4bdc/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+fd00::a428:6cb1:bd73/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+fd00::a444:b2fa:97a1/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a4f3:ed88:a5e1/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+fd00::a521:dfd9:1d6f/128 2      12      100 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::a531:6eb6:f342/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+fd00::a542:6ed5:2808/128 2      12      140 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::a54e:81ad:89e4/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a589:736a:9ca3/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+fd00::a743:c143:e83d/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+fd00::a7c2:3ae4:3b1c/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a7f2:6661:3c03/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::a8bd:78db:81cf/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::a929:45b1:975b/128 2      12      100 int eth1       IPV6 0fcba2972cb6       
+fd00::a93c:a46b:d94/128 2      12      280 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::aa39:15ba:eb00/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::aa64:97c2:ab56/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::aafb:8a9a:a550/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::ab39:90c:67d2/128 2      12       70 int eth1        IPV6 0fcba2972cb6       
+fd00::aba8:d7c9:cdc/128 2      12      210 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::accc:7aa:d805/128 2      12      300 int eth1        IPV6 0fcba2972cb6       
+fd00::ad54:533a:6cb5/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::adb2:8a94:2375/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::aed3:4fac:6d16/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+fd00::af87:c4bf:dbca/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::b0bb:999b:f58a/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::b149:bd3e:e6c3/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+fd00::b384:b6f7:2c6b/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+fd00::b3f1:fd5f:19a0/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+fd00::b493:27d3:d255/128 2      12      130 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::b4b2:cd1f:49bb/128 2      12      130 int eth1       IPV6 0fcba2972cb6       
+fd00::b4d9:a082:1ed3/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::b514:90:ef36/128 2      12      360 int eth1         IPV6 0fcba2972cb6       
+fd00::b88d:1c8c:638b/128 2      12      130 int eth1       IPV6 0fcba2972cb6       
+fd00::b8d8:ba74:d903/128 2      12      120 int eth0       IPV6 3fa41a4ff534       
+fd00::b912:d3f3:b0a8/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::ba83:2a29:1c86/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::bb63:bb5e:c998/128 2      12      200 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::bb6a:caaa:b1b3/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::bb6c:dffe:353f/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::bbe8:479c:c97b/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+fd00::bd07:8c11:eb05/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+fd00::bd53:2400:b357/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::be41:d544:b547/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::be72:fb96:640/128 2      12      140 int eth1        IPV6 0fcba2972cb6       
+fd00::beba:dd62:6053/128 2      12       30 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::bf0b:a684:104c/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::c007:40b5:5e8e/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::c0a0:b93a:ac0f/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::c1e3:cbce:9036/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::c325:b375:2898/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::c37e:34e9:702a/128 2      12       30 int eth0       IPV6 3fa41a4ff534       
+fd00::c42b:46a5:39e/128 2      12       50 int eth1        IPV6 0fcba2972cb6       
+fd00::c449:2482:8bdc/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+fd00::c4b8:6a4b:ea07/128 2      12      280 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::c594:cf3:831d/128 2      12       70 int eth1        IPV6 0fcba2972cb6       
+fd00::c5cb:315e:fe6/128 2      12      140 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::c629:83b4:9e72/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+fd00::c65c:7794:fd65/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+fd00::c70e:9b31:7bb9/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::c962:b4c6:5512/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+fd00::ca5f:be3:d9cf/128 2      12      250 int eth1        IPV6 0fcba2972cb6       
+fd00::ca64:edf7:f6d1/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::ca75:d35:177/128 2      12      220 int eth0         IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::cac5:30f0:7bcd/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+fd00::cc37:11d7:a73a/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::ccd0:a3f0:f3d3/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+fd00::ccee:aafd:8e0c/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+fd00::cd25:3d12:eaeb/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+fd00::cd2e:9512:1f42/128 2      12       90 int eth0       IPV6 3fa41a4ff534       
+fd00::cd6c:8f79:c805/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::cede:d1bc:b41e/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+fd00::ceeb:570e:c044/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::cf14:c730:2709/128 2      12      140 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d180:bef2:22b8/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d486:72ed:7823/128 2      12      200 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d4d9:8610:416d/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+fd00::d4d9:cb0d:85f6/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::d610:d5bc:da84/128 2      12       80 int eth1       IPV6 0fcba2972cb6       
+fd00::d6bc:b7e9:bc9e/128 2      12       60 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d721:847f:c67a/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d75f:e5b9:f3c8/128 2      12      110 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d7be:dab6:78cc/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d82f:1ceb:b94a/128 2      12       70 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d830:14c5:9e2b/128 2      12      310 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d8f8:f01d:889f/128 2      12      210 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::d93c:768a:b9e7/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::d94c:a3e8:748e/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::d97e:4b42:ac85/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+fd00::d984:7cc5:3063/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+fd00::d999:6745:5901/128 2      12       40 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::d9e1:5616:330f/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::da9b:4773:4d4e/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::dad3:e310:1e36/128 2      12      300 int eth1       IPV6 0fcba2972cb6       
+fd00::dc06:e0b7:619/128 2      12      160 int eth1        IPV6 0fcba2972cb6       
+fd00::dc63:54bb:c54c/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+fd00::dca1:36a4:290a/128 2      12      130 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::dcae:6adc:8ecb/128 2      12      180 int eth0       IPV6 3fa41a4ff534       
+fd00::dcb3:6e47:f41f/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::de41:cc77:59f1/128 2      12      160 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::dea0:55b3:6829/128 2      12      380 int eth1       IPV6 0fcba2972cb6       
+fd00::deb1:a2dd:568/128 2      12       80 int eth0        IPV6 3fa41a4ff534       
+fd00::df60:9697:e146/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::df87:9bc8:8c31/128 2      12      340 int eth1       IPV6 0fcba2972cb6       
+fd00::e1fc:9f21:bed6/128 2      12      140 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::e28e:e866:3551/128 2      12      350 int eth1       IPV6 0fcba2972cb6       
+fd00::e45d:8bc:7de9/128 2      12      130 int eth1        IPV6 0fcba2972cb6       
+fd00::e4b0:2d78:e2ac/128 2      12      110 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::e57d:9a3e:45e5/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+fd00::e61c:4435:1b2f/128 2      12      350 int eth1       IPV6 0fcba2972cb6       
+fd00::e6fe:90a2:5ba6/128 2      12      190 int eth1       IPV6 0fcba2972cb6       
+fd00::e764:2a57:67d9/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+fd00::e76d:f5b7:54b3/128 2      12      100 int eth1       IPV6 0fcba2972cb6       
+fd00::e786:bcfe:28f/128 2      12      230 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::e7cd:70ea:ab5c/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::e948:1087:50/128 2      12       80 int eth1         IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::eb3d:37d0:6b8d/128 2      12      230 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::ec53:1270:87bc/128 2      12      320 int eth1       IPV6 0fcba2972cb6       
+fd00::ecfb:d2cb:7687/128 2      12      110 int eth1       IPV6 0fcba2972cb6       
+fd00::ed07:ad92:c68a/128 2      12      250 int eth1       IPV6 0fcba2972cb6       
+fd00::ed19:622b:b6b2/128 2      12       60 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::ee3d:4b18:5bf1/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::eeb7:f01d:92f0/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::ef03:c8b6:6a09/128 2      12      130 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::ef67:2184:e9a5/128 2      12       50 int eth1       IPV6 0fcba2972cb6       
+fd00::ef80:a3b8:5225/128 2      12      110 int eth1       IPV6 0fcba2972cb6       
+fd00::ef89:ef21:ab9c/128 2      12       70 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::efef:bc9f:ee8c/128 2      12      100 int eth1       IPV6 0fcba2972cb6       
+fd00::f060:4edd:ce0c/128 2      12      370 int eth1       IPV6 0fcba2972cb6       
+fd00::f0b5:1c8f:12fb/128 2      12       50 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::f188:b258:e9be/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::f344:63ee:3147/128 2      12       90 int eth1       IPV6 0fcba2972cb6       
+fd00::f369:618c:c707/128 2      12      150 int eth1       IPV6 0fcba2972cb6       
+fd00::f396:5524:19ef/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::f3dc:9ae1:7332/128 2      12      210 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::f527:926e:46cd/128 2      12       90 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::f65e:de47:d3f0/128 2      12       60 int eth1       IPV6 0fcba2972cb6       
+fd00::f72c:e17f:6a1c/128 2      12      180 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::f75c:b91b:412b/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+fd00::f84d:4dba:169d/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+fd00::f877:5d4a:dcf/128 2      12      250 int eth1        IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::f8db:b4d6:681c/128 2      12       80 int eth0       IPV6 3fa41a4ff534       
+                                           eth1            IPV6 0fcba2972cb6       
+fd00::f9ea:aec9:58aa/128 2      12      240 int eth1       IPV6 0fcba2972cb6       
+fd00::fbbc:7b04:ffea/128 2      12      220 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::fbfc:ba40:a032/128 2      12      330 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::fd09:ea99:85df/128 2      12      360 int eth1       IPV6 0fcba2972cb6       
+fd00::fda9:54e8:ffe3/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::fdd9:6b07:a661/128 2      12      270 int eth1       IPV6 0fcba2972cb6       
+fd00::fdda:d521:2c06/128 2      12      120 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::fe9c:c4f6:1b20/128 2      12      260 int eth1       IPV6 0fcba2972cb6       
+                                           eth0            IPV6 3fa41a4ff534       
+fd00::ff67:db89:8408/128 2      12      290 int eth1       IPV6 0fcba2972cb6       
+
+node_400 loopback ipv6 is fd00::cc37:11d7:a73a
+
+show route to node_400 from node1:
+fd00::cc37:11d7:a73a from :: via fe80::e448:63ff:fe23:1201 dev eth1 proto 22 src fd00::f49b:bc12:c15b metric 1024 pref medium
+
+traceroute to node_400 from node1 with 16 simultaneous probes:
+traceroute to fd00::cc37:11d7:a73a (fd00::cc37:11d7:a73a), 30 hops max, 80 byte packets
+ 1  fd00::fcb:a297:2cb6  0.597 ms  0.006 ms  0.005 ms  0.005 ms  0.005 ms  0.005 ms
+ 2  fd00::a371:85a7:2c1b  0.090 ms  0.007 ms  0.007 ms  0.007 ms  0.008 ms  0.007 ms
+ 3  fd00::9fee:ff49:52fa  0.130 ms  0.015 ms  0.015 ms  0.013 ms  0.013 ms  0.008 ms
+ 4  fd00::6602:fb6d:c47e  0.111 ms  0.042 ms  0.017 ms  0.016 ms  0.012 ms  0.012 ms
+ 5  fd00::c42b:46a5:39e  0.112 ms  0.034 ms  0.033 ms  0.034 ms  0.018 ms  0.035 ms
+ 6  * * * * * *
+ 7  * * * * * *
+ 8  * * * * * *
+ 9  * * * * * *
+10  * * * * * *
+11  * * fd00::ef80:a3b8:5225  0.962 ms  0.028 ms  0.022 ms  0.022 ms
+12  fd00::5663:be9e:269d  0.113 ms  0.027 ms  0.024 ms  0.030 ms  0.027 ms  0.025 ms
+13  fd00::b4b2:cd1f:49bb  0.118 ms  0.030 ms  0.028 ms  0.027 ms  0.032 ms  0.037 ms
+14  fd00::2d19:eed4:5dc9  0.130 ms  0.032 ms  0.029 ms  0.029 ms  0.029 ms  0.029 ms
+15  fd00::f369:618c:c707  0.145 ms  0.039 ms  0.035 ms  0.032 ms  0.032 ms  0.030 ms
+16  fd00::dc06:e0b7:619  0.130 ms  0.037 ms  0.044 ms  0.036 ms  0.039 ms  0.033 ms
+17  fd00::4f5d:df54:f577  0.127 ms  0.039 ms  0.034 ms  0.034 ms  0.034 ms  0.034 ms
+18  fd00::5d2d:8231:4773  0.133 ms  0.042 ms  0.037 ms  0.036 ms  0.037 ms  0.036 ms
+19  fd00::966f:b2c0:38e5  0.129 ms  0.042 ms  0.049 ms  0.041 ms * *
+20  * * * * * *
+21  * * * * * *
+22  * * * * fd00::2698:7992:f014  0.197 ms  0.054 ms
+23  fd00::a408:95d8:4bdc  1.139 ms  0.057 ms  0.053 ms  0.050 ms  0.050 ms  0.050 ms
+24  fd00::f9ea:aec9:58aa  0.168 ms  0.062 ms  0.053 ms  0.052 ms  0.054 ms  0.052 ms
+25  fd00::5dbb:8917:fc6a  0.166 ms  0.064 ms  0.056 ms  0.054 ms  0.054 ms  0.055 ms
+26  fd00::d984:7cc5:3063  0.172 ms  0.064 ms  0.058 ms  0.057 ms  0.068 ms  0.059 ms
+27  fd00::626e:c175:72b  0.157 ms  0.062 ms  0.060 ms  0.060 ms  0.064 ms  0.059 ms
+28  fd00::b3f1:fd5f:19a0  0.159 ms  0.066 ms  0.066 ms  0.062 ms  0.063 ms  0.061 ms
+29  fd00::cd9:6fdf:751b  0.165 ms  0.069 ms  0.066 ms  0.065 ms  0.070 ms  0.064 ms
+30  fd00::753b:19d7:4c6f  0.166 ms  0.076 ms  0.118 ms  0.074 ms  0.067 ms  0.066 ms
+
+show isis spf log on node_1
+ IS-IS level 1 SPF log:
+Start time          Elapsed (secs) Count Reason
+Sat Nov 14 12:26:33        0.000023    2 Reconfig
+
+ IS-IS level 2 SPF log:
+Start time          Elapsed (secs) Count Reason
+Sat Nov 14 12:26:33        0.000006    9 Reconfig
+Sat Nov 14 12:26:43        0.000064    5 Topologies changed for adjacency 0fcba2972cb6 on eth1
+Sat Nov 14 12:27:03        0.000084   12 Topologies changed for adjacency 3fa41a4ff534 on eth0
+Sat Nov 14 12:27:03        0.000080   10 New LSP f75cb91b412b.00-00
+Sat Nov 14 12:27:03        0.000099   13 New LSP d180bef222b8.00-00
+Sat Nov 14 12:27:08        0.000235  174 New LSP 814daa9590f9.00-00
+Sat Nov 14 12:27:08        0.000202    9 New LSP d99967455901.00-00
+Sat Nov 14 12:27:09        0.000291    5 New LSP 6d4ba82cfaef.00-00
+Sat Nov 14 12:27:14        0.001895  220 New LSP c44924828bdc.00-00
+Sat Nov 14 12:27:14        0.002562    9 New LSP 7d5f9ab0ef7a.00-00
+Sat Nov 14 12:27:14        0.001445    3 New LSP f8dbb4d6681c.00-00
+Sat Nov 14 12:27:19        0.001449   65 New LSP 17fbe7d715b1.00-00
