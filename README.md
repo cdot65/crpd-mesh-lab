@@ -13,9 +13,10 @@ rows and columns as arguments to the link container in the docker-compose file.
 
 ## Requirements
 
-- Linux based baremetal server with enough memory (150MB per cRPD instances, e.g. 400 nodes fit within 64GB of RAM), tested with Ubuntu 20.04
+- Linux based baremetal server with enough memory (150MB per cRPD instances, e.g. 400 nodes fit within 64GB of RAM)
 - Docker with docker-compose 
 - Juniper cRPD 20.3R1 or newer container image (http://https://www.juniper.net/us/en/dm/crpd-trial/)
+- tested so far on Ubuntu 20.04, Fedora 33 and on Docker-for-Mac
 
 ## 20-node deployment
 
@@ -239,4 +240,31 @@ validation completed in 106 seconds
 ![honeycomb400](honeycomb400.png)
 
 Complete log output can be found in [make-scale400-log.txt](make-scale400-log.txt).
+
+## Docker for OSX
+
+20-node deployment works just fine, though it takes a bit over a minute to bootstrap. Simply launch it via
+
+```
+$ make
+. . .
+Creating honeycomb_node_18 ... done                                                                                                                                      
+Creating honeycomb_node_19 ... done                                                                                                                                      
+Creating honeycomb_node_20 ... done                                                                                                                                      
+./validate.sh
+                                                                                                                                                                         waiting for ISIS adjacencies to come up ....       3
+waiting for       20 routes learned
+
+21 routes learned
+
+Completed 24 links for 20 (4x5) nodes in 45 seconds
+validation completed in 89 seconds
+```
+
+To verify the linuxkit version the container run on:
+
+```
+$ docker exec -ti honeycomb_node_20 uname -a
+Linux c9fabea03fa3 5.4.39-linuxkit #1 SMP Fri May 8 23:03:06 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+```
 
