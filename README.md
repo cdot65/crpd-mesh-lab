@@ -247,6 +247,13 @@ validation completed in 106 seconds
 
 Complete log output can be found in [make-scale400-log.txt](make-scale400-log.txt).
 
+Works fine on an Intel NUC i7-10710U with 12 vCores and 64GB of RAM:
+
+System infos:                                                                       
+Model name: Intel(R) Core(TM) i7-10710U CPU @ 1.10GHz          
+MemTotal:   65574212 kB
+
+
 ## Docker for OSX
 
 20-node deployment works just fine, though it takes a bit over a minute to bootstrap. Simply launch it via
