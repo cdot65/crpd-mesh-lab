@@ -6,9 +6,11 @@ import os
 from pprint import pprint
 from igraph import *
 
+
 def nodeid(row, col):
     rv = (row - 1)*cols + col
     return(rv)
+
 
 project = sys.argv[1]
 rows = int(sys.argv[2])
@@ -26,22 +28,22 @@ g.add_vertices(rows * cols)
 
 for row in range(1, rows + 1):
     for col in range(1, cols + 1):
-        g.vs[nodecount]["id"]= nodecount + 1
-        g.vs[nodecount]["label"]= str(nodecount + 1)
+        g.vs[nodecount]["id"] = nodecount + 1
+        g.vs[nodecount]["label"] = str(nodecount + 1)
         nodecount += 1
         if col > 1:
-            g.add_edges([(nodeid(row, col) -1,nodeid(row, col -1) -1)])
+            g.add_edges([(nodeid(row, col) - 1, nodeid(row, col - 1) - 1)])
             linkcount += 1
 
         if (row > 1) and ((row % 2) != (col % 2)):
             # odd row
-            g.add_edges([(nodeid(row, col) -1,nodeid(row -1, col) -1)])
+            g.add_edges([(nodeid(row, col) - 1, nodeid(row - 1, col) - 1)])
             linkcount += 1
 
 visual_style = {}
 out_name = "honeycomb.png"
 # Set bbox and margin
-visual_style["bbox"] = (1000,1000)
+visual_style["bbox"] = (1000, 1000)
 visual_style["margin"] = 30
 # Set vertex colours
 visual_style["vertex_color"] = 'white'
@@ -57,4 +59,3 @@ visual_style["layout"] = my_layout
 pprint(g.layout())
 # Plot the graph
 plot(g, out_name, **visual_style)
-
