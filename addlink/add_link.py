@@ -54,6 +54,14 @@ def newifname(container):
     return('eth{}'.format(i))
 
 
+def setloopbackip(node, i):
+    create_netns(node)
+    ns = NetNS(node)
+    idx = ns.link_lookup(ifname='lo')[0]
+    ns.addr('add', index=idx, address='fd00::{}'.format(i), prefixlen=128)
+    print("set {} lo addr fd00::{}/128".format(node, i))
+    ns.close()
+
 def addlink(c1, c2):
     create_netns(c1)
     ifname1 = newifname(c1)
@@ -93,18 +101,20 @@ for row in range(1, rows + 1):
         g.vs[nodecount]["id"]= nodecount + 1
         g.vs[nodecount]["label"]= str(nodecount + 1)
         nodecount += 1
+        node='{}_node_{}'.format(project, nodeid(row, col))
         if col > 1:
-            addlink('{}_node_{}'.format(project, nodeid(row, col)),
+            addlink(node, 
                     '{}_node_{}'.format(project, nodeid(row, col - 1)))
             g.add_edges([(nodeid(row, col) -1,nodeid(row, col -1) -1)])
             linkcount += 1
 
         if (row > 1) and ((row % 2) != (col % 2)):
             # odd row
-            addlink('{}_node_{}'.format(project, nodeid(row, col)),
+            addlink(node,
                     '{}_node_{}'.format(project, nodeid(row - 1, col)))
             g.add_edges([(nodeid(row, col) -1,nodeid(row -1, col) -1)])
             linkcount += 1
+        setloopbackip(node, nodeid(row, col))
 
 end = time.perf_counter()
 seconds = int(end - start)

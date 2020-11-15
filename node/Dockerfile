@@ -1,6 +1,6 @@
 FROM crpd:20.3R1.8
 RUN apt-get update \
-  && apt-get -y --no-install-recommends install bwm-ng gettext-base \
+  && apt-get -y --no-install-recommends install bwm-ng gettext-base iperf3 \
   && rm -rf /var/lib/apt/lists/*
 
 COPY runit-init.sh /sbin/
