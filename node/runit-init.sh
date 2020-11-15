@@ -15,7 +15,4 @@ if [ -f /juniper.conf ]; then
   envsubst < /juniper.conf >> /config/juniper.conf
 fi
 
-echo "launching iperf3 server ..."
-/usr/bin/iperf3 --server --daemon
-
 exec /sbin/runit-init 0
