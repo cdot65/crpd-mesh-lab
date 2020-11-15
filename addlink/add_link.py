@@ -62,6 +62,7 @@ def setloopbackip(node, i):
     print("set {} lo addr fd00::{}/128".format(node, i))
     ns.close()
 
+
 def addlink(c1, c2):
     create_netns(c1)
     ifname1 = newifname(c1)
@@ -98,21 +99,21 @@ g.add_vertices(rows * cols)
 
 for row in range(1, rows + 1):
     for col in range(1, cols + 1):
-        g.vs[nodecount]["id"]= nodecount + 1
-        g.vs[nodecount]["label"]= str(nodecount + 1)
+        g.vs[nodecount]["id"] = nodecount + 1
+        g.vs[nodecount]["label"] = str(nodecount + 1)
         nodecount += 1
-        node='{}_node_{}'.format(project, nodeid(row, col))
+        node = '{}_node_{}'.format(project, nodeid(row, col))
         if col > 1:
-            addlink(node, 
+            addlink(node,
                     '{}_node_{}'.format(project, nodeid(row, col - 1)))
-            g.add_edges([(nodeid(row, col) -1,nodeid(row, col -1) -1)])
+            g.add_edges([(nodeid(row, col) - 1, nodeid(row, col - 1) - 1)])
             linkcount += 1
 
         if (row > 1) and ((row % 2) != (col % 2)):
             # odd row
             addlink(node,
                     '{}_node_{}'.format(project, nodeid(row - 1, col)))
-            g.add_edges([(nodeid(row, col) -1,nodeid(row -1, col) -1)])
+            g.add_edges([(nodeid(row, col) - 1, nodeid(row - 1, col) - 1)])
             linkcount += 1
         setloopbackip(node, nodeid(row, col))
 
@@ -126,7 +127,7 @@ print("Completed {} links for {} ({}x{}) nodes in {} seconds".format(
 visual_style = {}
 out_name = "honeycomb.png"
 # Set bbox and margin
-visual_style["bbox"] = (1000,1000)
+visual_style["bbox"] = (1000, 1000)
 visual_style["margin"] = 30
 # Set vertex colours
 visual_style["vertex_color"] = 'white'
