@@ -5,7 +5,7 @@ Docker-compose is used to scale up the number of nodes that are automatically in
 within the link container. The same script also auto-generates a grid topology bitmap, which can be exctracted from the container 
 at runtime (check the validate.sh script). 
 
-![honeycomb](honeycomb.png)
+![honeycomb](honeycomb_auto.png)
 
 Each node is running cRPD with an auto-generated IPv6 loopback and link-local addresse with Level-2 ISIS and per-packet load balancing to gain
 full connectivity across the topology. The size of the topology can be adjusted by changed the scale parameter plus setting the desired # of
@@ -37,14 +37,14 @@ docker-compose --project-name honeycomb up -d
 ./validate.sh
 
 waiting for ISIS adjacencies to come up 3
-waiting for 20 routes learned ..
+waiting for 20 routes learned ...
 
-25 routes learned
-Completed 24 links for 20 (4x5) nodes in 5 seconds
-validation completed in 8 seconds
+34 routes learned
+Completed 24 links for 20 (4x5) nodes in 4 seconds
+validation completed in 9 seconds
 
 network diagram saved in
--rw-r--r-- 1 mwiget mwiget 15418 Nov 14 14:38 honeycomb.png
+-rw-r--r-- 1 mwiget mwiget 15418 Nov 15 16:29 honeycomb.png
 ./test-nodes.sh
 
 20 nodes found
@@ -53,137 +53,143 @@ show route summary on node 3:
 Autonomous system number: 4259905011
 Router ID: 10.0.0.11
 
-RIB Unique destination routes high watermark: 25 at 2020-11-14 13:38:27
-RIB routes high watermark: 25 at 2020-11-14 13:38:27
-FIB routes high watermark: 15 at 2020-11-14 13:38:27
-VRF type routing instances high watermark: 0 at 2020-11-14 13:38:21
+RIB Unique destination routes high watermark: 30 at 2020-11-15 15:29:47
+RIB routes high watermark: 30 at 2020-11-15 15:29:47
+FIB routes high watermark: 20 at 2020-11-15 15:29:47
+VRF type routing instances high watermark: 0 at 2020-11-15 15:29:40
 
 iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
               Direct:      1 routes,      1 active
 
-inet6.0: 24 destinations, 24 routes (24 active, 0 holddown, 0 hidden)
+inet6.0: 29 destinations, 29 routes (29 active, 0 holddown, 0 hidden)
               Direct:      3 routes,      3 active
                Local:      6 routes,      6 active
-               IS-IS:     14 routes,     14 active
+               IS-IS:     19 routes,     19 active
                INET6:      1 routes,      1 active
 show first few routes on crpd node 3:
 
 iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
 
-47.0005.abcd.abcd.0000.0000.0010.d301.a1ba.8e29/152               
-                   *[Direct/0] 00:00:06
+47.0005.abcd.abcd.0000.0000.0010.7c55.c543.ebc4/152               
+                   *[Direct/0] 00:00:08
                     >  via lo.0
 
-inet6.0: 24 destinations, 24 routes (24 active, 0 holddown, 0 hidden)
+inet6.0: 29 destinations, 29 routes (29 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
 
-::/96              *[Direct/0] 00:00:06
+::/96              *[Direct/0] 00:00:08
                     >  via sit0
-::127.0.0.1/128    *[Local/0] 00:00:06
+::127.0.0.1/128    *[Local/0] 00:00:08
                        Local via sit0
-fd00::ddc:5032:67be/128
-                   *[IS-IS/18] 00:00:00, metric 50
-                    >  to fe80::c00b:e9ff:fe63:3aa9 via eth2
-fd00::1368:76c2:4d9e/128
-                   *[IS-IS/18] 00:00:00, metric 40
-                    >  to fe80::c00b:e9ff:fe63:3aa9 via eth2
-fd00::2835:a2d2:58a0/128
-                   *[IS-IS/18] 00:00:00, metric 20
-                    >  to fe80::c00b:e9ff:fe63:3aa9 via eth2
-fd00::3ca6:d014:8dd9/128
-                   *[IS-IS/18] 00:00:06, metric 10
-                    >  to fe80::c37:dbff:fe31:43db via eth0
-fd00::6a39:bec6:5c8c/128
-                   *[IS-IS/18] 00:00:00, metric 10
-                    >  to fe80::c00b:e9ff:fe63:3aa9 via eth2
-fd00::89f7:a4e2:3e16/128
-                   *[IS-IS/18] 00:00:00, metric 20
-                    >  to fe80::c00b:e9ff:fe63:3aa9 via eth2
-fd00::a469:35ab:f5d0/128
-                   *[IS-IS/18] 00:00:00, metric 30
-                       to fe80::40ad:f7ff:fecc:bb1c via eth1
-                    >  to fe80::c00b:e9ff:fe63:3aa9 via eth2
-fd00::a879:53d7:b45f/128
-                   *[IS-IS/18] 00:00:00, metric 30
-                    >  to fe80::c00b:e9ff:fe63:3aa9 via eth2
+fd00::1/128        *[IS-IS/18] 00:00:07, metric 20
+                    >  to fe80::2894:b6ff:fe5d:beb3 via eth0
+fd00::2/128        *[IS-IS/18] 00:00:07, metric 10
+                    >  to fe80::2894:b6ff:fe5d:beb3 via eth0
+fd00::3/128        *[Direct/0] 00:00:08
+                    >  via lo.0
+fd00::4/128        *[IS-IS/18] 00:00:07, metric 10
+                    >  to fe80::8f2:3aff:fe91:aa4f via eth1
+fd00::5/128        *[IS-IS/18] 00:00:07, metric 20
+                    >  to fe80::8f2:3aff:fe91:aa4f via eth1
+fd00::6/128        *[IS-IS/18] 00:00:02, metric 30
+                       to fe80::2894:b6ff:fe5d:beb3 via eth0
+                    >  to fe80::2c9d:94ff:feaa:ed36 via eth2
+fd00::7/128        *[IS-IS/18] 00:00:02, metric 20
+                    >  to fe80::2c9d:94ff:feaa:ed36 via eth2
+fd00::8/128        *[IS-IS/18] 00:00:02, metric 10
+                    >  to fe80::2c9d:94ff:feaa:ed36 via eth2
+fd00::9/128        *[IS-IS/18] 00:00:02, metric 20
+                    >  to fe80::2c9d:94ff:feaa:ed36 via eth2
+fd00::10/128       *[IS-IS/18] 00:00:02, metric 30
+                       to fe80::8f2:3aff:fe91:aa4f via eth1
+                    >  to fe80::2c9d:94ff:feaa:ed36 via eth2
+fd00::11/128       *[IS-IS/18] 00:00:01, metric 40
+                    >  to fe80::2c9d:94ff:feaa:ed36 via eth2
+fd00::12/128       *[IS-IS/18] 00:00:02, metric 30
 
 show first few routes on node 3:
 ::/96 dev sit0 proto kernel metric 256 pref medium
-fd00::ddc:5032:67be via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::1368:76c2:4d9e via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::2835:a2d2:58a0 via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::3ca6:d014:8dd9 via fe80::c37:dbff:fe31:43db dev eth0 proto 22 metric 1024 pref medium
-fd00::6a39:bec6:5c8c via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::89f7:a4e2:3e16 via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::a469:35ab:f5d0 proto 22 metric 1024 
-	nexthop via fe80::40ad:f7ff:fecc:bb1c dev eth1 weight 1 
-	nexthop via fe80::c00b:e9ff:fe63:3aa9 dev eth2 weight 1 
-fd00::a879:53d7:b45f via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::c46b:d0f:f12 via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::c5b7:a773:8fb0 via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::cd24:fa60:f05b via fe80::40ad:f7ff:fecc:bb1c dev eth1 proto 22 metric 1024 pref medium
-fd00::d27c:21c0:53b0 via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fd00::d301:a1ba:8e29 dev lo proto kernel metric 256 pref medium
-fd00::f660:461a:64bc via fe80::40ad:f7ff:fecc:bb1c dev eth1 proto 22 metric 1024 pref medium
-fd00::ffa8:fdac:22b1 via fe80::c00b:e9ff:fe63:3aa9 dev eth2 proto 22 metric 1024 pref medium
-fe80::/64 dev eth0 proto kernel metric 256 pref medium
-fe80::/64 dev eth1 proto kernel metric 256 pref medium
+fd00::1 via fe80::2894:b6ff:fe5d:beb3 dev eth0 proto 22 metric 1024 pref medium
+fd00::2 via fe80::2894:b6ff:fe5d:beb3 dev eth0 proto 22 metric 1024 pref medium
+fd00::3 dev lo proto kernel metric 256 pref medium
+fd00::4 via fe80::8f2:3aff:fe91:aa4f dev eth1 proto 22 metric 1024 pref medium
+fd00::5 via fe80::8f2:3aff:fe91:aa4f dev eth1 proto 22 metric 1024 pref medium
+fd00::6 proto 22 metric 1024 
+	nexthop via fe80::2894:b6ff:fe5d:beb3 dev eth0 weight 1 
+	nexthop via fe80::2c9d:94ff:feaa:ed36 dev eth2 weight 1 
+fd00::7 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
+fd00::8 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
+fd00::9 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
+fd00::10 proto 22 metric 1024 
+	nexthop via fe80::8f2:3aff:fe91:aa4f dev eth1 weight 1 
+	nexthop via fe80::2c9d:94ff:feaa:ed36 dev eth2 weight 1 
+fd00::11 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
+fd00::12 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
+fd00::13 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
+fd00::14 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
+fd00::15 via fe80::2c9d:94ff:feaa:ed36 dev eth2 proto 22 metric 1024 pref medium
 
 show isis routes on node 1:
- IS-IS routing table             Current version: L1: 1 L2: 5
+ IS-IS routing table             Current version: L1: 1 L2: 6
 IPv4/IPv6 Routes
 ----------------
 Prefix             L Version   Metric Type Interface       NH   Via                 Backup Score
-fd00::ddc:5032:67be/128 2       5       50 int eth1        IPV6 aeb8c5e574e7       
-fd00::1368:76c2:4d9e/128 2       5       40 int eth1       IPV6 aeb8c5e574e7       
-fd00::2835:a2d2:58a0/128 2       5       20 int eth1       IPV6 aeb8c5e574e7       
-fd00::3ca6:d014:8dd9/128 2       5       10 int eth0       IPV6 3ca6d0148dd9       
-fd00::6a39:bec6:5c8c/128 2       5       30 int eth1       IPV6 aeb8c5e574e7       
-                                           eth0            IPV6 3ca6d0148dd9       
-fd00::89f7:a4e2:3e16/128 2       5       40 int eth1       IPV6 aeb8c5e574e7       
-                                           eth0            IPV6 3ca6d0148dd9       
-fd00::a469:35ab:f5d0/128 2       5       50 int eth1       IPV6 aeb8c5e574e7       
-                                           eth0            IPV6 3ca6d0148dd9       
-fd00::a879:53d7:b45f/128 2       5       30 int eth1       IPV6 aeb8c5e574e7       
-fd00::aeb8:c5e5:74e7/128 2       5       10 int eth1       IPV6 aeb8c5e574e7       
-fd00::c46b:d0f:f12/128 2       5       50 int eth1         IPV6 aeb8c5e574e7       
-fd00::c5b7:a773:8fb0/128 2       5       40 int eth1       IPV6 aeb8c5e574e7       
-fd00::cd24:fa60:f05b/128 2       5       30 int eth0       IPV6 3ca6d0148dd9       
-fd00::d27c:21c0:53b0/128 2       5       60 int eth1       IPV6 aeb8c5e574e7       
-fd00::d301:a1ba:8e29/128 2       5       20 int eth0       IPV6 3ca6d0148dd9       
-fd00::f660:461a:64bc/128 2       5       40 int eth0       IPV6 3ca6d0148dd9       
-fd00::ffa8:fdac:22b1/128 2       5       50 int eth1       IPV6 aeb8c5e574e7       
-                                           eth0            IPV6 3ca6d0148dd9       
+fd00::2/128        2       6       10 int  eth0            IPV6 b1c70fadb6d4       
+fd00::3/128        2       6       20 int  eth0            IPV6 b1c70fadb6d4       
+fd00::4/128        2       6       30 int  eth0            IPV6 b1c70fadb6d4       
+fd00::5/128        2       6       40 int  eth0            IPV6 b1c70fadb6d4       
+fd00::6/128        2       6       10 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::7/128        2       6       20 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::8/128        2       6       30 int  eth1            IPV6 6ee2dea5f6a7       
+                                           eth0            IPV6 b1c70fadb6d4       
+fd00::9/128        2       6       40 int  eth1            IPV6 6ee2dea5f6a7       
+                                           eth0            IPV6 b1c70fadb6d4       
+fd00::10/128       2       6       50 int  eth0            IPV6 b1c70fadb6d4       
+                                           eth1            IPV6 6ee2dea5f6a7       
+fd00::11/128       2       6       40 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::12/128       2       6       30 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::13/128       2       6       40 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::14/128       2       6       50 int  eth1            IPV6 6ee2dea5f6a7       
+                                           eth0            IPV6 b1c70fadb6d4       
+fd00::15/128       2       6       60 int  eth1            IPV6 6ee2dea5f6a7       
+                                           eth0            IPV6 b1c70fadb6d4       
+fd00::16/128       2       6       50 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::17/128       2       6       60 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::18/128       2       6       50 int  eth1            IPV6 6ee2dea5f6a7       
+fd00::19/128       2       6       80 int  eth1            IPV6 6ee2dea5f6a7       
+                                           eth0            IPV6 b1c70fadb6d4       
+fd00::20/128       2       6       70 int  eth1            IPV6 6ee2dea5f6a7       
+                                           eth0            IPV6 b1c70fadb6d4       
 
-node_20 loopback ipv6 is fd00::1721:cfa0:1f1c
-                                           
+node_20 loopback ipv6 is fd00::20
+
 show route to node_20 from node1:
-fd00::1721:cfa0:1f1c from :: via fe80::3c05:96ff:fe0e:4de dev eth0 proto 22 src fd00::f926:317:529 metric 1024 pref medium
-
-traceroute to node_20 from node1 with 16 simultaneous probes:
-traceroute to fd00::1721:cfa0:1f1c (fd00::1721:cfa0:1f1c), 30 hops max, 80 byte packets
- 1  fd00::aeb8:c5e5:74e7  0.047 ms  0.004 ms  0.003 ms  0.003 ms  0.003 ms  0.002 ms
- 2  fd00::2835:a2d2:58a0  0.024 ms  0.005 ms  0.005 ms  0.005 ms  0.004 ms  0.004 ms
- 3  fd00::a879:53d7:b45f  0.028 ms fd00::6a39:bec6:5c8c  0.032 ms fd00::a879:53d7:b45f  0.008 ms fd00::6a39:bec6:5c8c  0.006 ms  0.008 ms  0.005 ms
- 4  fd00::89f7:a4e2:3e16  0.033 ms  0.007 ms fd00::c5b7:a773:8fb0  0.030 ms  0.011 ms  0.011 ms fd00::89f7:a4e2:3e16  0.010 ms
- 5  fd00::ffa8:fdac:22b1  0.050 ms  0.011 ms  0.008 ms  0.007 ms  0.011 ms fd00::c46b:d0f:f12  0.029 ms
- 6  fd00::1f5d:e4d8:5977  0.029 ms  0.009 ms fd00::631d:6dff:f87d  0.035 ms fd00::1f5d:e4d8:5977  0.011 ms fd00::631d:6dff:f87d  0.009 ms fd00::1f5d:e4d8:5977  0.010 ms
- 7  fd00::1721:cfa0:1f1c  0.034 ms  0.047 ms  0.012 ms  0.011 ms  0.010 ms  0.010 ms
+fd00::20 from :: via fe80::b43e:c9ff:fe8c:45dd dev eth0 proto 22 src fd00::1 metric 1024 pref medium
 
 show isis spf log on node_1
  IS-IS level 1 SPF log:
 Start time          Elapsed (secs) Count Reason
-Sat Nov 14 13:38:21        0.000045    2 Reconfig
+Sun Nov 15 15:29:40        0.000051    3 Reconfig
 
  IS-IS level 2 SPF log:
 Start time          Elapsed (secs) Count Reason
-Sat Nov 14 13:38:21        0.000097   22 Reconfig
-Sat Nov 14 13:38:22        0.000313    6 Updated LSP a46935abf5d0.00-00
-Sat Nov 14 13:38:22        0.000339    1 New LSP a87953d7b45f.00-00
-Sat Nov 14 13:38:27        0.000142   21 New LSP c5b7a7738fb0.00-00
-Sat Nov 14 13:38:28        0.000090    1 Updated LSP c5b7a7738fb0.00-00
-Sat Nov 14 13:38:28        0.000145    1 Updated LSP ffa8fdac22b1.00-00
+Sun Nov 15 15:29:40        0.000075   26 Reconfig
+Sun Nov 15 15:29:41        0.000113    4 Updated LSP 33a03f9b8221.00-00
+Sun Nov 15 15:29:41        0.000086    2 New LSP f535b3da6e04.00-00
+Sun Nov 15 15:29:46        0.000132   25 Updated LSP f535b3da6e04.00-00
+Sun Nov 15 15:29:47        0.000142    2 New LSP bc8ea96e1816.00-00
+Sun Nov 15 15:29:47        0.000146    2 Updated LSP 7e84a126afeb.00-00
+
+traceroute to node_20 from node1 with 16 simultaneous probes:
+traceroute to fd00::20 (fd00::20), 30 hops max, 80 byte packets
+ 1  fd00::2  0.063 ms  0.008 ms  0.007 ms  0.007 ms  0.006 ms  0.006 ms
+ 2  fd00::3  0.037 ms  0.011 ms  0.011 ms  0.010 ms  0.011 ms  0.010 ms
+ 3  * * * * * *
+ 4  * * * * * *
+ 5  * * * * fd00::14  0.201 ms  0.048 ms
+ 6  fd00::15  0.059 ms  0.027 ms  0.024 ms  0.025 ms  0.025 ms  0.023 ms
+ 7  fd00::20  0.051 ms  0.029 ms  0.078 ms  0.029 ms  0.027 ms  0.027 ms
 ```
 
 The generated image uses a grid, which scales best with large topologies:
